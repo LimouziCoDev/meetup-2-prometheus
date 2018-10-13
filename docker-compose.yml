@@ -1,0 +1,46 @@
+version: "3"
+
+volumes:
+  grafana_data: {}
+
+services:
+  ##############
+  # prometheus server
+  ##############
+  prom:
+    image: quay.io/prometheus/prometheus:v2.4.3
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+    command: "--config.file=/etc/prometheus/prometheus.yml --storage.tsdb.path=/prometheus"
+    ports:
+      - 9090:9090
+    depends_on:
+      - exporter
+
+  ##############
+  # prometheus node exporter
+  ##############
+  exporter:
+    image: prom/node-exporter:latest
+    ports:
+      - "9100:9100"
+
+  ##############
+  # grafana visalisation
+  ##############
+  grafana:
+    image: grafana/grafana:5.2.4
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./grafana/datasources:/etc/grafana/datasources
+      - ./grafana/dashboards:/etc/grafana/dashboards
+      - ./grafana/setup.sh:/setup.sh
+    entrypoint: /setup.sh
+    environment:
+      - GF_SECURITY_ADMIN_USER=${ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${ADMIN_PASSWORD:-admin}
+      - GF_USERS_ALLOW_SIGN_UP=false
+    depends_on:
+      - prom
