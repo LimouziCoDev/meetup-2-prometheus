@@ -6,3 +6,7 @@ gofull:
 .PHONY: generic
 generic:
 	docker-compose up
+
+.PHONY: nodejs
+nodejs:
+	docker-compose -f docker-compose.yml -f docker-compose.nodejs.yml up --build
