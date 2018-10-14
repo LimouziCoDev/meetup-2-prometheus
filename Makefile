@@ -10,3 +10,8 @@ generic:
 .PHONY: nodejs
 nodejs:
 	docker-compose -f docker-compose.yml -f docker-compose.nodejs.yml up --build
+
+
+.PHONY: dotnet
+dotnet:
+	docker-compose -f docker-compose.yml -f docker-compose.dotnet.yml up --build
